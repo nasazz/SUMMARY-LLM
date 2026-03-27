@@ -1,0 +1,75 @@
+/* Global Styles - Properly ordered for library compatibility */
+
+/* 1. NG-Zorro (placed first so PrimeNG and Tailwind can override) */
+@import "ng-zorro-antd/ng-zorro-antd.min.css";
+
+/* 2. PrimeIcons */
+@import "primeicons/primeicons.css";
+
+/* 3. Tailwind - Standard approach */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 4. Global App Styles */
+:root {
+  --p-surface-50: #f8fafc;
+  --p-surface-900: #0f172a;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--p-surface-50);
+  color: var(--p-surface-900);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 5. Ensure app-root takes full height */
+app-root {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+/* 6. Component Overrides */
+.p-inputtext {
+  width: 100%;
+}
+
+.p-popover-arrow {
+  display: none !important;
+}
+
+/* 7. SVG Sizing - Tailwind utility support */
+svg {
+  display: inline-block;
+}
+
+/* 8. Override NG-Zorro SVG sizing to prevent giant icons */
+.anticon svg {
+  width: 1em;
+  height: 1em;
+}
+
+/* 
+    PrimeNG Popover Dark Mode Fix 
+    Since popovers are appended to body, they must check for the 'dark' class on HTML
+*/
+.html.dark .user-profile-popover, 
+.dark .user-profile-popover,
+:root.dark .user-profile-popover {
+    background-color: #0f172a !important; /* slate-900 */
+    border: 1px solid #1e293b; /* slate-800 */
+    color: #f8fafc;
+}
+
+.user-profile-popover .p-popover-content {
+    padding: 0 !important;
+    background: transparent !important;
+}
