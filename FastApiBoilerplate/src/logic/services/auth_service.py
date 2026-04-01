@@ -1,66 +1,53 @@
-from sqlalchemy.orm import Session
-from fastapi import Depends
-from src.domain.auth.auth_models import User
-from src.infrastructure.database import get_db
-from src.core.security import verify_password, create_access_token, get_password_hash
-from src.core.result import Result
-from src.domain.auth.auth_shemas import Token, UserRegister, UserResponse
+from src.data.unit_of_work import UnitOfWork
+from src.data.entities.models import User
+from src.presentation.dtos.auth_dtos import UserResponse, Token
+from src.logic.results import Result
+from src.core.security import get_password_hash, verify_password, create_access_token
 
 class AuthService:
-    def __init__(self, db: Session):
-        # We inject the raw session here purely for read-only Auth lookups
-        self._db = db
-
-    def login(self, email: str, plain_password: str) -> Result[Token]:
-        """
-        Validates credentials and mints a JWT.
-        """
-        # 1. Find user by email
-        user = self._db.query(User).filter(User.email == email).first()
-        if not user:
-            return Result(is_success=False, error="Incorrect email or password")
-            
-        # 2. Check if account is active
-        if not user.is_active:
-            return Result(is_success=False, error="Inactive user account")
-
-        # 3. Verify cryptographic hash
-        if not verify_password(plain_password, user.hashed_password):
-            return Result(is_success=False, error="Incorrect email or password")
-
-        # 4. Mint the JWT
-        token_string = create_access_token(subject=str(user.id), role=user.role)
-        
-        token_dto = Token(access_token=token_string)
-        return Result(is_success=True, value=token_dto)
+    """Orchestrates authorization mappings binding Entities dynamically securely to generic logic states."""
     
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
 
-    def register(self, user_in: UserRegister) -> Result[UserResponse]:
-        """Registers a new user from the Angular frontend."""
-        # 1. Check if email exists
-        if self._db.query(User).filter(User.email == user_in.email).first():
-            return Result(is_success=False, error="Email already registered")
-            
-        # 2. Map DTO to Entity (Mocking some fields for now that aren't in our DB yet)
-        new_user = User(
-            email=user_in.email,
-            hashed_password=get_password_hash(user_in.password),
-            # role="Operator", # Default role
-            is_active=True
-        )
-        
+    def register_user(self, email: str, raw_password: str, role: str = "User") -> Result[UserResponse]:
         try:
-            self._db.add(new_user)
-            self._db.commit()
-            self._db.refresh(new_user)
-            
-            return Result(
-                is_success=True, 
-                value=UserResponse(id=new_user.id, email=new_user.email)
-            )
+            with self.uow:
+                existing = self.uow.users.get_by_email(email)
+                if existing:
+                    return Result.failure("Email already registered.")
+                
+                hashed_pw = get_password_hash(raw_password)
+                new_user = User(Email=email, HashedPassword=hashed_pw, Role=role)
+                self.uow.users.add(new_user)
+                self.uow.session.flush() # Ensure ID and defaults are populated
+                
+                response = UserResponse.model_validate(new_user)
+                return Result.success(response)
         except Exception as e:
-            self._db.rollback()
-            return Result(is_success=False, error=str(e))
+            return Result.failure(f"Registration failed: {str(e)}")
 
-def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
-    return AuthService(db)
+    def authenticate_user(self, email: str, raw_password: str) -> Result[Token]:
+        with self.uow:
+            user = self.uow.users.get_by_email(email)
+            if not user or not verify_password(raw_password, user.HashedPassword):
+                return Result.failure("Unauthorized: Incorrect email or password")
+            if not user.IsActive:
+                return Result.failure("Forbidden: User account is inactive")
+            
+            # Form standard Token Mapping
+            token_payload = {"sub": user.Email, "role": user.Role}
+            access_token = create_access_token(data=token_payload)
+            token = Token(access_token=access_token)
+            
+            return Result.success(token)
+    
+    # def get_current_user(self) -> Result[UserResponse]:
+    #     # This method would typically extract user info from the token in a real implementation
+    #     # For demonstration, we will just return a dummy user response
+    #     try:
+    #         # In a real scenario, you would decode the token and fetch user details from DB
+    #         dummy_user = UserResponse(id="0B951E7F-67E2-4917-AEB4-5517FD613AB2", email="admin@corporate.com", role="Admin")
+    #         return Result.success(dummy_user)
+    #     except Exception as e:
+    #         return Result.failure(f"Failed to get current user: {str(e)}")

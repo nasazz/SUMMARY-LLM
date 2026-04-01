@@ -6,12 +6,10 @@ export const API_CONFIG = {
 
   endpoints: {
     auth: {
-      // Result: https://localhost:../api/auth/login
       login: '/auth/login',
-
-      // Result: https://localhost:../api/auth/register
       register: '/auth/register',
       me: '/auth/me',
+      logout: '/auth/logout',
     },
     // Future placeholders based on your  domain
     users: {
@@ -23,6 +21,10 @@ export const API_CONFIG = {
     reference: {
       plants: '/reference/plants',
       departments: '/reference/departments'
+    },
+    documents: {
+      upload: '/documents/',
+      getById: (id: string) => `/documents/${id}`,
     }
   }
 };

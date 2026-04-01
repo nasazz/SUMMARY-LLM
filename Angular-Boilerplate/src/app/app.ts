@@ -12,7 +12,7 @@ import { ThemeService } from './core/services/theme.service';
   }
 })
 export class App {
-  protected readonly title = signal('IMS');
+  protected readonly title = signal('GEN');
 
   constructor(private themeService: ThemeService) { }
 }

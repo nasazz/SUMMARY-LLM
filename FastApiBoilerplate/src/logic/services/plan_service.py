@@ -1,12 +1,12 @@
-from src.domain.plans.plan_models import ProductionPlan
-from src.domain.plans.plan_schemas import ProductionPlanCreate, ProductionPlanResponse
-from src.infrastructure.repository import GenericRepository
-from src.infrastructure.uow import UnitOfWork
+from src.presentation.dtos.plans.plan_models import ProductionPlan
+from src.presentation.dtos.plans.plan_schemas import ProductionPlanCreate, ProductionPlanResponse
+from src.data.repositories.repository import GenericRepository
+from src.data.repositories.uow import UnitOfWork
 from src.core.result import Result
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from src.infrastructure.database import get_db
-from src.domain.common_schemas import (
+from src.data.repositories.database import get_db
+from src.presentation.dtos.common_schemas import (
     PaginatedResponse,
 )  # Add this to your imports at the top
 

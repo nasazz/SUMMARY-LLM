@@ -1,39 +1,36 @@
 import { AuthResponseDto, UserInfo } from '../../domain/dtos/auth.dto';
 
 /**
- * Maps backend AuthResponseDto to frontend UserInfo model
- * Handles fallbacks for missing data and normalizes role/name formats
+ * Decodes a JWT payload (base64url) without verification (verification is done server-side).
+ */
+function decodeJwtPayload(token: string): any {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64));
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Maps FastAPI JWT token response → frontend UserInfo.
+ * FastAPI returns { access_token, token_type }.
+ * We decode the payload to extract sub (email) and role.
  */
 export function mapAuthResponseToUserInfo(response: AuthResponseDto | any): UserInfo {
-    // Handle fullName fallback - derive from email if not provided
-    let derivedName = response.fullName;
-    if (!derivedName && response.email) {
-        derivedName = response.email.split('@')[0];
-        derivedName = derivedName.charAt(0).toUpperCase() + derivedName.slice(1);
-    }
+  const token = response.access_token || response.token || '';
+  const payload = decodeJwtPayload(token);
 
-    // Handle roles - backend returns array, we need first role
-    const derivedRole = Array.isArray(response.roles)
-        ? response.roles[0]
-        : (response.role || 'User');
+  const email = payload?.sub || response.email || '';
+  const role = payload?.role || response.role || 'User';
+  const derivedName = email.split('@')[0];
 
-    // Split name into first/last
-    const names = derivedName ? derivedName.split(' ') : ['User'];
-    const firstName = names[0];
-    const lastName = names.length > 1 ? names.slice(1).join(' ') : '';
-
-    return {
-        id: response.id || response.userId,
-        email: response.email,
-        fullName: derivedName,
-        firstName: firstName,
-        lastName: lastName,
-        role: derivedRole,
-        phoneNumber: response.phoneNumber,
-        teId: response.teId,
-        department: response.department,
-        jobTitle: response.jobTitle,
-        isActive: response.isActive,
-        plant: response.plant
-    };
+  return {
+    id: payload?.user_id || response.id || '',
+    email,
+    fullName: derivedName.charAt(0).toUpperCase() + derivedName.slice(1),
+    role,
+    isActive: true,
+  };
 }

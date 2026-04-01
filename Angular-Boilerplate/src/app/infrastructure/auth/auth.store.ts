@@ -6,9 +6,8 @@ import { inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../infrastructure/auth/auth.service';
-import { LoginCommand, RegisterCommand, UserInfo } from '../../domain/dtos/auth.dto';
+import { LoginCommand, RegisterCommand } from '../../domain/dtos/auth.dto';
 import { parseHttpError } from '../../core/utils/http-error.utils';
-import { mapAuthResponseToUserInfo } from '../../core/utils/auth-mapping.utils';
 
 interface AuthState {
   isLoading: boolean;
@@ -26,7 +25,6 @@ export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
 
-  // Expose AuthService state directly
   withComputed((store, authService = inject(AuthService)) => ({
     user: computed(() => authService.currentUser()),
     isAuthenticated: computed(() => !!authService.currentUser())
@@ -34,24 +32,20 @@ export const AuthStore = signalStore(
 
   withMethods((store, authService = inject(AuthService), router = inject(Router)) => ({
 
-    // --- LOGIN ACTION ---
     login: rxMethod<LoginCommand>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null, validationErrors: {} })),
         switchMap((command) =>
-          // Service handles the side effects (storage, state update)
           authService.login(command).pipe(
             tapResponse({
-              next: (response) => {
+              next: () => {
                 patchState(store, { isLoading: false });
                 router.navigate(['/app']);
               },
               error: (err: HttpErrorResponse) => {
-                const errorMsg = parseHttpError(err);
-                const backendErrors = err.error?.validationErrors || {};
                 patchState(store, {
-                  error: errorMsg,
-                  validationErrors: backendErrors,
+                  error: parseHttpError(err),
+                  validationErrors: err.error?.validationErrors || {},
                   isLoading: false
                 });
               },
@@ -61,7 +55,6 @@ export const AuthStore = signalStore(
       )
     ),
 
-    // --- REGISTER ACTION ---
     register: rxMethod<RegisterCommand>(
       pipe(
         tap(() => patchState(store, { isLoading: true, error: null, validationErrors: {} })),
@@ -70,40 +63,15 @@ export const AuthStore = signalStore(
             tapResponse({
               next: () => {
                 patchState(store, { isLoading: false });
-                // Redirect to Login on Success
                 router.navigate(['/auth/login']);
               },
               error: (err: HttpErrorResponse) => {
-                const errorMsg = parseHttpError(err);
-                const backendErrors = err.error?.validationErrors || {};
                 patchState(store, {
-                  error: errorMsg,
-                  validationErrors: backendErrors,
+                  error: parseHttpError(err),
+                  validationErrors: err.error?.validationErrors || {},
                   isLoading: false
                 });
               },
-            })
-          )
-        )
-      )
-    ),
-
-    syncUser: rxMethod<void>(
-      pipe(
-        switchMap(() =>
-          authService.getMe().pipe(
-            tapResponse({
-              next: (response) => {
-                // Use shared mapping utility
-                const user = mapAuthResponseToUserInfo(response);
-
-                // Update local storage and signal
-                localStorage.setItem('user', JSON.stringify(user));
-                authService.currentUser.set(user);
-              },
-              error: () => {
-                // verification failed
-              }
             })
           )
         )
@@ -116,7 +84,7 @@ export const AuthStore = signalStore(
 
     logout: () => {
       authService.logout();
-      patchState(store, initialState); // Reset UI state
+      patchState(store, initialState);
     }
   }))
 );

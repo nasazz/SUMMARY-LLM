@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from typing import Optional
-from sqlalchemy import String, Integer, DateTime, Float, ForeignKey, Text
+from sqlalchemy import String, Integer, DateTime, Float, ForeignKey, Text, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from src.data.database import Base
@@ -41,3 +41,12 @@ class DocumentAnalysis(Base):
 
     # Relationship back to Document
     Document: Mapped["Document"] = relationship("Document", back_populates="Analysis")
+
+class User(Base):
+    __tablename__ = 'Users'
+    
+    Id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    Email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    HashedPassword: Mapped[str] = mapped_column(String(255), nullable=False)
+    Role: Mapped[str] = mapped_column(String(50), default='User', nullable=False)
+    IsActive: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

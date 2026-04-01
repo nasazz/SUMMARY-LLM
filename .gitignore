@@ -1,0 +1,30 @@
+# Environment Files
+.env
+*.env
+**/.env
+.env.*
+
+# Python / FastAPI
+FastApiBoilerplate/venv/
+FastApiBoilerplate/.venv/
+FastApiBoilerplate/__pycache__/
+FastApiBoilerplate/*.pyc
+FastApiBoilerplate/storage/
+FastApiBoilerplate/.pytest_cache/
+FastApiBoilerplate/htmlcov/
+FastApiBoilerplate/.coverage
+
+# Angular
+Angular-Boilerplate/node_modules/
+Angular-Boilerplate/.angular/
+Angular-Boilerplate/dist/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project Docs
+GEMINI.md
+prd.md

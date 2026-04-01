@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from src.domain.plans.plan_schemas import ProductionPlanCreate, ProductionPlanResponse
-from src.domain.common_schemas import PaginatedResponse
-from src.services.plan_service import PlanService, get_plan_service
+from src.presentation.dtos.plans.plan_schemas import ProductionPlanCreate, ProductionPlanResponse
+from src.presentation.dtos.common_schemas import PaginatedResponse
+from src.logic.services.plan_service import PlanService, get_plan_service
 from src.api.dependencies import RoleChecker, TokenPayload
 
 

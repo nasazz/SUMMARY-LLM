@@ -1,0 +1,97 @@
+services:
+  redis:
+    image: redis:alpine
+    container_name: summary_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - summary_network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: summary_db
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong@Passw0rd!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    networks:
+      - summary_network
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd!", "-Q", "SELECT 1", "-C"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./FastApiBoilerplate
+      dockerfile: backend.Dockerfile
+    container_name: summary_api
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./FastApiBoilerplate/src:/app/src
+      - ./FastApiBoilerplate/storage:/app/storage
+    environment:
+      - PROJECT_NAME=FastAPI Enterprise Boilerplate
+      - API_V1_STR=/api/v1
+      - SECRET_KEY=f8b7b23ad0bf6908a84a05a6bbf923a54a501a60344967ef5312de5b04b68a2f
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong@Passw0rd!@db:1433/master?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - summary_network
+
+  worker:
+    build:
+      context: ./FastApiBoilerplate
+      dockerfile: backend.Dockerfile
+    container_name: summary_worker
+    command: celery -A src.core.celery_app worker --loglevel=info
+    volumes:
+      - ./FastApiBoilerplate/src:/app/src
+      - ./FastApiBoilerplate/storage:/app/storage
+    environment:
+      - PROJECT_NAME=FastAPI Enterprise Boilerplate
+      - API_V1_STR=/api/v1
+      - SECRET_KEY=f8b7b23ad0bf6908a84a05a6bbf923a54a501a60344967ef5312de5b04b68a2f
+      - ACCESS_TOKEN_EXPIRE_MINUTES=60
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong@Passw0rd!@db:1433/master?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - summary_network
+
+  frontend:
+    build:
+      context: ./Angular-Boilerplate
+      dockerfile: frontend.Dockerfile
+    container_name: summary_frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./Angular-Boilerplate/src:/app/src
+    depends_on:
+      - api
+    networks:
+      - summary_network
+
+networks:
+  summary_network:
+    driver: bridge

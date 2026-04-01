@@ -57,7 +57,7 @@ export class MainLayoutComponent {
   readonly themeService = inject(ThemeService);
 
   constructor() {
-    this.authStore.syncUser();
+    // JWT is stateless — user info is already decoded from the token at login time.
   }
 
   toggleSidebar() {
