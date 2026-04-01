@@ -4,17 +4,16 @@
     <!-- Logo Area -->
     <div class="h-24 flex items-center gap-4 px-8 mb-2" [class.justify-center]="isCollapsed()"
         [class.px-0]="isCollapsed()">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 flex-none transform transition-transform hover:scale-105 cursor-pointer"
-            (click)="onToggle()">
-            <i class="pi pi-bolt text-white text-xl"></i>
+         <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+          <i class="pi pi-file-edit text-white text-base"></i>
         </div>
 
         @if (!isCollapsed()) {
         <div class="flex flex-col animate-in fade-in slide-in-from-left-4 duration-300">
             <span
-                class="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white leading-none">TaskMaster</span>
+                class="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white leading-none">SummaryGen</span>
             <span
-                class="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mt-0.5">Workspace</span>
+                class="text-[10px] font-medium text-purple-600 dark:text-purple-400 uppercase tracking-widest mt-0.5">Workspace</span>
         </div>
         }
     </div>
@@ -31,10 +30,10 @@
             }
 
             <a routerLink="/app/checklist-selection"
-                routerLinkActive="!bg-emerald-50/80 !text-emerald-700 dark:!bg-emerald-500/10 dark:!text-emerald-400 shadow-sm ring-1 ring-emerald-100 dark:ring-emerald-500/20"
+                routerLinkActive="!bg-purple-50/80 !text-purple-700 dark:!bg-purple-500/10 dark:!text-purple-400 shadow-sm ring-1 ring-purple-100 dark:ring-purple-500/20"
                 class="flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-slate-200 transition-all duration-200 group relative overflow-hidden"
                 [class.justify-center]="isCollapsed()">
-                <i class="pi pi-objects-column text-xl transition-colors group-hover:text-emerald-500"
+                <i class="pi pi-objects-column text-xl transition-colors group-hover:text-purple-500"
                     pTooltip="Projects" [tooltipDisabled]="!isCollapsed()" tooltipPosition="right"></i>
                 @if (!isCollapsed()) {
                 <span class="font-semibold text-sm tracking-wide">Projects</span>
@@ -60,7 +59,7 @@
 
     <!-- Footer: Profile Card -->
     <div class="p-4 mx-2 mb-2">
-        <div class="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 flex items-center gap-3.5 hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors cursor-pointer group"
+        <div class="relative overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 flex items-center gap-3.5 hover:border-purple-200 dark:hover:border-purple-800 transition-colors cursor-pointer group"
             [class.justify-center]="isCollapsed()">
 
             <!-- Avatar -->
@@ -73,7 +72,7 @@
             @if (!isCollapsed()) {
             <div class="flex-1 min-w-0 flex flex-col relative z-10">
                 <span
-                    class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-emerald-600 transition-colors">{{
+                    class="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-purple-600 transition-colors">{{
                     store.user()?.fullName }}</span>
                 <span class="text-[10px] font-medium text-slate-400 truncate">{{ store.user()?.role || 'User' }}</span>
             </div>
