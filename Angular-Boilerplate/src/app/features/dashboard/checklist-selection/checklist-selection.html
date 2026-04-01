@@ -200,7 +200,7 @@
         </div>
         <div class="text-center">
           <p class="text-white font-semibold text-base mb-1">AI is analyzing your document</p>
-          <p class="text-slate-400 text-sm">GPT-4o is extracting insights. This takes about 30–60 seconds...</p>
+          <p class="text-slate-400 text-sm">Gemini is extracting insights. This takes about 30–60 seconds...</p>
         </div>
         <!-- Live pulse bar -->
         <div class="w-full max-w-xs bg-slate-800 rounded-full h-1.5 overflow-hidden">
@@ -231,10 +231,10 @@
         <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Confidence Score</span>
-            <span class="text-lg font-bold text-emerald-400">{{ confidencePercent(selectedJob()!.analysis!.confidence_score) }}%</span>
+            <span class="text-lg font-bold text-purpled-400">{{ confidencePercent(selectedJob()!.analysis!.confidence_score) }}%</span>
           </div>
           <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-            <div class="h-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-700"
+            <div class="h-2 rounded-full bg-gradient-to-r from-purpled-500 to-teal-500 transition-all duration-700"
               [style.width.%]="confidencePercent(selectedJob()!.analysis!.confidence_score)">
             </div>
           </div>

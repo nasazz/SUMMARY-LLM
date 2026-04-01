@@ -43,7 +43,7 @@ import { ThemeService } from '../../core/services/theme.service';
           @if (themeService.darkMode()) {
             <i class="pi pi-sun text-yellow-500 text-2xl group-hover:rotate-90 transition-transform"></i>
           } @else {
-            <i class="pi pi-moon text-emerald-600 dark:text-emerald-400 text-2xl group-hover:-rotate-12 transition-transform"></i>
+            <i class="pi pi-moon text-purple-600 dark:text-purple-400 text-2xl group-hover:-rotate-12 transition-transform"></i>
           }
         </button>
       </div>
