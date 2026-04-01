@@ -1,185 +1,121 @@
-<div class="min-h-screen w-full flex items-center justify-center p-4 lg:p-12 relative overflow-hidden">
+<div class="min-h-screen w-full flex items-center justify-center bg-slate-950 relative overflow-hidden p-6">
 
-  <!-- Full Background Image -->
-  <div class="absolute inset-0 z-0">
-    <!-- Image: Checklist/Team Collaboration -->
-    <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=2070&auto=format&fit=crop"
-      alt="Background" class="w-full h-full object-cover" />
-    <!-- Gradient Overlay (Darker) -->
-    <div
-      class="absolute inset-0 bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-emerald-900/80 backdrop-blur-sm">
-    </div>
+  <!-- Background effects -->
+  <div class="absolute inset-0 bg-gradient-to-br from-violet-950/20 via-slate-950 to-indigo-950/20 pointer-events-none"></div>
+  <div class="absolute top-1/4 left-1/3 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- Grid -->
+  <div class="absolute inset-0 opacity-30"
+    style="background-image: linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px); background-size: 40px 40px;">
   </div>
 
-  <!-- Theme Toggle (Top Right) -->
-  <!-- Floating Theme Toggle (Bottom Right) -->
-  <div class="absolute bottom-8 right-8 z-50">
-    <button (click)="themeService.toggleTheme()"
-      class="flex items-center justify-center w-14 h-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white shadow-xl hover:scale-110 hover:bg-white/20 transition-all duration-200 group">
-      @if (themeService.darkMode()) {
-      <i class="pi pi-sun text-yellow-400 text-2xl group-hover:rotate-90 transition-transform"></i>
-      } @else {
-      <i class="pi pi-moon text-blue-200 text-2xl group-hover:-rotate-12 transition-transform"></i>
-      }
-    </button>
-  </div>
+  <!-- Card -->
+  <div class="relative z-10 w-full max-w-[460px] bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-2xl shadow-violet-900/20 p-8 lg:p-10 animate-in fade-in zoom-in-95 duration-400">
 
-  <!-- Centered Card -->
-  <div
-    class="relative z-10 w-full max-w-[900px] bg-white/5 dark:bg-slate-950/50 backdrop-blur-xl border border-white/10 dark:border-white/5 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in fade-in zoom-in-95 duration-500">
-
-    <!-- Left: Welcome/Info (Hidden on small screens) -->
-    <div class="hidden md:flex flex-col justify-between p-10 w-1/3 bg-emerald-600/10 border-r border-white/5 relative">
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-emerald-900/20"></div>
-      <div class="relative z-10">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shadow-lg mb-4">
-          <i class="pi pi-check text-white text-xl"></i>
-        </div>
-        <h2 class="text-2xl font-bold text-white mb-2">Join TaskMaster</h2>
-        <p class="text-emerald-100/70 text-sm leading-relaxed">Create an account to start organizing your projects and
-          collaborating with your team effectively.</p>
+    <!-- Branding -->
+    <div class="flex items-center gap-3 mb-8">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+        <i class="pi pi-file-edit text-white text-base"></i>
       </div>
-
-      <div class="relative z-10 space-y-4">
-        <div class="flex items-center gap-3 text-sm text-emerald-50">
-          <i class="pi pi-check-circle text-emerald-400"></i>
-          <span>Unlimited Checklists</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm text-emerald-50">
-          <i class="pi pi-users text-emerald-400"></i>
-          <span>Team Collaboration</span>
-        </div>
-        <div class="flex items-center gap-3 text-sm text-emerald-50">
-          <i class="pi pi-shield text-emerald-400"></i>
-          <span>Secure Data</span>
-        </div>
-      </div>
-
-      <div class="relative z-10 pt-8 border-t border-white/10 mt-8">
-        <p class="text-xs text-white/40">© 2026 TE Connectivity plc.</p>
-      </div>
+      <span class="text-base font-bold text-white tracking-tight">SummaryGen</span>
     </div>
 
-    <!-- Right: Form -->
-    <div class="flex-1 p-8 lg:p-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md">
-
-      <div class="md:hidden flex items-center gap-3 mb-6">
-        <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center shadow-sm">
-          <i class="pi pi-check text-white"></i>
-        </div>
-        <h2 class="text-xl font-bold text-slate-800 dark:text-white">Create Account</h2>
-      </div>
-
-      <h2 class="hidden md:block text-2xl font-bold text-slate-800 dark:text-white mb-6">Create Account</h2>
-
-      <!-- Error Alert -->
-      @if (store.error()) {
-      <p-message severity="error" [text]="store.error() || undefined" styleClass="w-full mb-4 shadow-sm"></p-message>
-      }
-
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
-
-        <!-- Name & Email Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Full
-              Name</label>
-            <input pInputText formControlName="fullName" placeholder="Enter your full name"
-              class="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg !py-2.5 !text-sm shadow-sm"
-              [class.ng-invalid]="getFieldError('fullName')" />
-            @if (getFieldError('fullName'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email</label>
-            <input pInputText formControlName="email" placeholder="john@example.com"
-              class="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg !py-2.5 !text-sm shadow-sm"
-              [class.ng-invalid]="getFieldError('email')" />
-            @if (getFieldError('email'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-        </div>
-
-        <!-- Password Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Password</label>
-            <p-password formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="w-full"
-              inputStyleClass="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg !py-2.5 !text-sm shadow-sm"
-              placeholder="••••••••" [class.ng-invalid]="getFieldError('password')"></p-password>
-            @if (getFieldError('password'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Confirm</label>
-            <p-password formControlName="confirmPassword" [toggleMask]="true" [feedback]="false" styleClass="w-full"
-              inputStyleClass="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg !py-2.5 !text-sm shadow-sm"
-              placeholder="••••••••" [class.ng-invalid]="getFieldError('confirmPassword')"></p-password>
-            @if (getFieldError('confirmPassword'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-        </div>
-
-        <!-- Metadata Row 1 -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">TE
-              ID</label>
-            <input pInputText formControlName="teId" placeholder="12345"
-              class="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg !py-2.5 !text-sm shadow-sm"
-              [class.ng-invalid]="getFieldError('teId')" />
-            @if (getFieldError('teId'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Plants</label>
-            <p-multiSelect [options]="plants()" formControlName="plantIds" optionLabel="name" optionValue="id"
-              display="chip" placeholder="Select"
-              styleClass="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg shadow-sm text-sm"
-              [class.ng-invalid]="getFieldError('plantIds')">
-            </p-multiSelect>
-            @if (getFieldError('plantIds'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-        </div>
-
-        <!-- Metadata Row 2 -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
-            <label
-              class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Department</label>
-            <p-select [options]="departments()" formControlName="department" optionLabel="name" optionValue="name"
-              placeholder="Select"
-              styleClass="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg shadow-sm text-sm"
-              [class.ng-invalid]="getFieldError('department')"></p-select>
-            @if (getFieldError('department'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-          <div class="flex flex-col gap-1.5">
-            <label class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Job
-              Title</label>
-            <p-select [options]="jobTitles" formControlName="jobTitle" optionLabel="label" optionValue="value"
-              styleClass="w-full !bg-white/50 dark:!bg-black/20 !border-slate-200 dark:!border-slate-700 focus:!border-emerald-500 dark:focus:!border-emerald-400 !rounded-lg shadow-sm text-sm"
-              placeholder="Select" [class.ng-invalid]="getFieldError('jobTitle')"></p-select>
-            @if (getFieldError('jobTitle'); as err) { <small class="text-red-500 text-xs">{{ err }}</small> }
-          </div>
-        </div>
-
-
-
-        <!-- Submit -->
-        <p-button type="submit" label="Sign Up" [loading]="store.isLoading()"
-          styleClass="w-full mt-2 !bg-gradient-to-r from-emerald-600 to-teal-500 hover:!from-emerald-700 hover:!to-teal-600 border-none !text-white !rounded-lg !py-3 !font-semibold shadow-lg shadow-emerald-500/25 transition-all active:scale-[0.98]">
-        </p-button>
-
-      </form>
-
-      <div class="text-center mt-6 pt-4 border-t border-slate-100 dark:border-white/5">
-        <span class="text-slate-500 dark:text-slate-400 text-sm">Already have an account? </span>
-        <a (click)="navigateToLogin()"
-          class="text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 cursor-pointer transition-colors">
-          Sign In
-        </a>
-      </div>
-
+    <div class="mb-7">
+      <h1 class="text-2xl font-bold text-white">Create your account</h1>
+      <p class="text-slate-400 text-sm mt-1.5">Start analyzing documents with AI in seconds.</p>
     </div>
-  </div>
 
+    <!-- Error Alert -->
+    @if (store.error()) {
+    <div class="flex items-center gap-3 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm mb-6 animate-in fade-in">
+      <i class="pi pi-exclamation-circle shrink-0"></i>
+      <span>{{ store.error() }}</span>
+    </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+
+      <!-- Email -->
+      <div class="flex flex-col gap-1.5">
+        <label for="reg-email" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Email Address</label>
+        <div class="relative">
+          <i class="pi pi-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm z-10"></i>
+          <input pInputText id="reg-email" formControlName="email" placeholder="you@company.com"
+            class="w-full !pl-10 !bg-slate-800/60 !border-slate-700/80 focus:!border-violet-500 !text-white !placeholder-slate-600 !rounded-xl !py-3 !text-sm transition-all"
+            [class.!border-red-500]="getFieldError('email')" />
+        </div>
+        @if (getFieldError('email'); as err) {
+        <small class="text-red-400 text-xs ml-1 flex items-center gap-1">
+          <i class="pi pi-exclamation-circle text-[10px]"></i> {{ err }}
+        </small>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="flex flex-col gap-1.5">
+        <label for="reg-password" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Password</label>
+        <div class="relative">
+          <i class="pi pi-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm z-10"></i>
+          <input [type]="passwordVisible() ? 'text' : 'password'" pInputText id="reg-password" formControlName="password"
+            placeholder="Min. 8 characters + uppercase + special"
+            class="w-full !pl-10 !pr-10 !bg-slate-800/60 !border-slate-700/80 focus:!border-violet-500 !text-white !placeholder-slate-600 !rounded-xl !py-3 !text-sm transition-all"
+            [class.!border-red-500]="getFieldError('password')" />
+          <i (click)="togglePassword()" [class]="'pi ' + (passwordVisible() ? 'pi-eye-slash' : 'pi-eye')"
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-violet-400 cursor-pointer transition-colors z-10">
+          </i>
+        </div>
+        @if (getFieldError('password'); as err) {
+        <small class="text-red-400 text-xs ml-1 flex items-center gap-1">
+          <i class="pi pi-exclamation-circle text-[10px]"></i> {{ err }}
+        </small>
+        }
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="flex flex-col gap-1.5">
+        <label for="reg-confirm" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Confirm Password</label>
+        <div class="relative">
+          <i class="pi pi-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm z-10"></i>
+          <input [type]="confirmVisible() ? 'text' : 'password'" pInputText id="reg-confirm" formControlName="confirmPassword"
+            placeholder="••••••••"
+            class="w-full !pl-10 !pr-10 !bg-slate-800/60 !border-slate-700/80 focus:!border-violet-500 !text-white !placeholder-slate-600 !rounded-xl !py-3 !text-sm transition-all"
+            [class.!border-red-500]="getFieldError('confirmPassword')" />
+          <i (click)="toggleConfirm()" [class]="'pi ' + (confirmVisible() ? 'pi-eye-slash' : 'pi-eye')"
+            class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-violet-400 cursor-pointer transition-colors z-10">
+          </i>
+        </div>
+        @if (getFieldError('confirmPassword'); as err) {
+        <small class="text-red-400 text-xs ml-1 flex items-center gap-1">
+          <i class="pi pi-exclamation-circle text-[10px]"></i> {{ err }}
+        </small>
+        }
+      </div>
+
+      <!-- Password hint -->
+      <p class="text-xs text-slate-500 -mt-2 ml-1">Requires uppercase letter and a special character (!&#64;#$...).</p>
+
+      <!-- Submit -->
+      <button type="submit" id="register-submit-btn"
+        class="w-full mt-1 py-3 px-6 rounded-xl font-semibold text-white text-sm bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+        [disabled]="store.isLoading()">
+        @if (store.isLoading()) {
+          <i class="pi pi-spinner pi-spin text-sm"></i>
+          <span>Creating account...</span>
+        } @else {
+          <i class="pi pi-user-plus text-sm"></i>
+          <span>Create Account</span>
+        }
+      </button>
+
+    </form>
+
+    <div class="text-center mt-6 pt-5 border-t border-slate-800">
+      <span class="text-slate-500 text-sm">Already have an account? </span>
+      <a (click)="navigateToLogin()"
+        class="text-sm font-semibold text-violet-400 hover:text-violet-300 cursor-pointer transition-colors hover:underline">
+        Sign in
+      </a>
+    </div>
+
+  </div>
 </div>

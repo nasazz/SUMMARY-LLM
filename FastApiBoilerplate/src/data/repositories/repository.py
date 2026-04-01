@@ -1,6 +1,6 @@
 from typing import TypeVar, Generic, Type, Any, Sequence
 from sqlalchemy.orm import Session
-from src.domain.base import Base
+from src.presentation.dtos.base import Base
 from sqlalchemy import select
 
 # T must be a SQLAlchemy model

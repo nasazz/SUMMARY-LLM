@@ -2,32 +2,25 @@ export interface UserInfo {
   id: string;
   email: string;
   fullName: string;
-  firstName?: string;
-  lastName?: string;
   role: string;
-  phoneNumber?: string;
-  teId?: string;
-  department?: string;
-  jobTitle?: string;
   isActive?: boolean;
-  plant?: string; // Comma-separated string of plants
 }
 
+/** Shape returned by FastAPI POST /auth/login */
 export interface AuthResponseDto {
+  access_token: string;
+  token_type: string;
+}
+
+/** Shape returned by FastAPI POST /auth/register */
+export interface UserResponse {
   id: string;
-  fullName: string;
   email: string;
-  token: string;
-  refreshToken: string;
-  roles: string[];
-  phoneNumber?: string;
-  teId?: string;
-  department?: string;
-  jobTitle?: string;
+  role: string;
+  is_active: boolean;
 }
 
 export interface LoginCommand {
-
   email: string;
   password: string;
 }
@@ -35,16 +28,8 @@ export interface LoginCommand {
 export interface RegisterCommand {
   email: string;
   password: string;
-  confirmPassword?: string; // Optional in interface to check, valid in form
-  fullName: string;
-  teId: string;
-  department: string;
-  plantIds: string[];
-  jobTitle: string;
-  supervisorId?: string | null;
+  role?: string;
 }
 
-export interface RegisterResponseDto {
-  userId: string;
-  message: string;
-}
+// Keep for backward compat
+export type RegisterResponseDto = UserResponse;

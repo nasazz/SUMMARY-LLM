@@ -2,6 +2,7 @@ from types import TracebackType
 from typing import Type, Optional
 from src.data.database import SessionLocal
 from src.data.repositories.document_repo import DocumentRepository
+from src.data.repositories.user_repo import UserRepository
 
 class UnitOfWork:
     """
@@ -11,10 +12,12 @@ class UnitOfWork:
     def __init__(self):
         self.session = SessionLocal()
         self.documents: DocumentRepository = None # type: ignore
+        self.users: UserRepository = None # type: ignore
 
     def __enter__(self):
         # Initialize repositories with the current session
         self.documents = DocumentRepository(self.session)
+        self.users = UserRepository(self.session)
         return self
 
     def __exit__(

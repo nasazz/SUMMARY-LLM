@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import String, Integer, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
-from src.domain.base import Base
+from src.data.database import Base
 
 class ProductionPlan(Base):
     """
