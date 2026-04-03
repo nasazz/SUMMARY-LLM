@@ -14,4 +14,5 @@ COPY . .
 EXPOSE 4200
 
 # Start with polling for hot-reload in Docker volumes
-CMD ["npm", "start", "--", "--host", "0.0.0.0", "--poll", "2000"]
+# --host 0.0.0.0 is enough so Docker can proxy requests to the dev server
+CMD ["npm", "start", "--", "--host", "0.0.0.0", "--port", "4200", "--poll", "2000"]
