@@ -1,12 +1,21 @@
-services:
-  redis:
-    image: redis:alpine
-    container_name: summary_redis
-    ports:
-      - "6379:6379"
-    networks:
-      - summary_network
+# =============================================================
+# docker-compose.yml
+# Run from the project root: docker-compose up --build
+#
+# Services:
+#   db       — SQL Server (Linux Container)
+#   redis    — message broker for Celery
+#   api      — FastAPI (uvicorn)
+#   worker   — Celery worker
+#   flower   — Celery monitoring UI  (http://localhost:5555)
+#   frontend — Angular dev server    (http://localhost:4200)
+#
+# Option A: fully containerized, isolated setup.
+# =============================================================
 
+services:
+
+  # ── SQL Server ───────────────────────────────────────────
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: summary_db
@@ -14,70 +23,104 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=YourStrong@Passw0rd!
       - MSSQL_PID=Developer
-    ports:
-      - "1433:1433"
     networks:
       - summary_network
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd!", "-Q", "SELECT 1", "-C"]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "YourStrong@Passw0rd!", "-Q", "SELECT 1", "-C", "-No"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # ── Redis ────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: summary_redis
+    networks:
+      - summary_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
       retries: 5
 
+  # ── FastAPI ───────────────────────────────────────────────
   api:
     build:
       context: ./FastApiBoilerplate
       dockerfile: backend.Dockerfile
     container_name: summary_api
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    # Runs init to create the database, then alembic migrations, then the server
+    command: /bin/bash -c "python src/init_db.py && alembic upgrade head && python -c 'from src.init_db import seed_admin; seed_admin()' && uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload"
     ports:
       - "8000:8000"
     volumes:
       - ./FastApiBoilerplate/src:/app/src
       - ./FastApiBoilerplate/storage:/app/storage
+      - ./FastApiBoilerplate/alembic.ini:/app/alembic.ini
+      - ./FastApiBoilerplate/alembic:/app/alembic
+    env_file:
+      - ./FastApiBoilerplate/.env
     environment:
-      - PROJECT_NAME=FastAPI Enterprise Boilerplate
-      - API_V1_STR=/api/v1
-      - SECRET_KEY=f8b7b23ad0bf6908a84a05a6bbf923a54a501a60344967ef5312de5b04b68a2f
-      - ACCESS_TOKEN_EXPIRE_MINUTES=60
-      - DATABASE_URL=mssql+pyodbc://sa:YourStrong@Passw0rd!@db:1433/master?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong%40Passw0rd!@db:1433/FastApiDb?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=no
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - summary_network
 
+  # ── Celery Worker ─────────────────────────────────────────
   worker:
     build:
       context: ./FastApiBoilerplate
       dockerfile: backend.Dockerfile
     container_name: summary_worker
-    command: celery -A src.core.celery_app worker --loglevel=info
+    command: celery -A src.core.celery_app worker --loglevel=info --concurrency=2
     volumes:
       - ./FastApiBoilerplate/src:/app/src
       - ./FastApiBoilerplate/storage:/app/storage
+    env_file:
+      - ./FastApiBoilerplate/.env
     environment:
-      - PROJECT_NAME=FastAPI Enterprise Boilerplate
-      - API_V1_STR=/api/v1
-      - SECRET_KEY=f8b7b23ad0bf6908a84a05a6bbf923a54a501a60344967ef5312de5b04b68a2f
-      - ACCESS_TOKEN_EXPIRE_MINUTES=60
-      - DATABASE_URL=mssql+pyodbc://sa:YourStrong@Passw0rd!@db:1433/master?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong%40Passw0rd!@db:1433/FastApiDb?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=no
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
     networks:
       - summary_network
 
+  # ── Celery Flower (monitoring UI) ─────────────────────────
+  flower:
+    build:
+      context: ./FastApiBoilerplate
+      dockerfile: backend.Dockerfile
+    container_name: summary_flower
+    command: celery -A src.core.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./FastApiBoilerplate/.env
+    environment:
+      - DATABASE_URL=mssql+pyodbc://sa:YourStrong%40Passw0rd!@db:1433/FastApiDb?driver=ODBC+Driver+18+for+SQL+Server&Encrypt=no
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - summary_network
+
+  # ── Angular Frontend ──────────────────────────────────────
   frontend:
     build:
       context: ./Angular-Boilerplate
